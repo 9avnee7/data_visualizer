@@ -1,0 +1,261 @@
+{
+  "algorithmName": "merge",
+  "trace": [
+    {
+      "event": "init",
+      "description": "Initialization of the algorithm",
+      "required_fields": {
+        "array": [
+          38,
+          27,
+          43,
+          3,
+          9,
+          82,
+          10
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          38,
+          27,
+          43,
+          3,
+          9,
+          82,
+          10
+        ],
+        "left_half": [
+          38,
+          27,
+          43
+        ],
+        "right_half": [
+          3,
+          9,
+          82,
+          10
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          38,
+          27,
+          43
+        ],
+        "left_half": [
+          38
+        ],
+        "right_half": [
+          27,
+          43
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          27,
+          43
+        ],
+        "left_half": [
+          27
+        ],
+        "right_half": [
+          43
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          27
+        ],
+        "right": [
+          43
+        ],
+        "merged": [
+          27,
+          43
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          38
+        ],
+        "right": [
+          27,
+          43
+        ],
+        "merged": [
+          27,
+          38,
+          43
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          3,
+          9,
+          82,
+          10
+        ],
+        "left_half": [
+          3,
+          9
+        ],
+        "right_half": [
+          82,
+          10
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          3,
+          9
+        ],
+        "left_half": [
+          3
+        ],
+        "right_half": [
+          9
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          3
+        ],
+        "right": [
+          9
+        ],
+        "merged": [
+          3,
+          9
+        ]
+      }
+    },
+    {
+      "event": "split",
+      "description": "When the array is being split",
+      "required_fields": {
+        "parent_array": [
+          82,
+          10
+        ],
+        "left_half": [
+          82
+        ],
+        "right_half": [
+          10
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          82
+        ],
+        "right": [
+          10
+        ],
+        "merged": [
+          10,
+          82
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          3,
+          9
+        ],
+        "right": [
+          10,
+          82
+        ],
+        "merged": [
+          3,
+          9,
+          10,
+          82
+        ]
+      }
+    },
+    {
+      "event": "merge",
+      "description": "When two halves are being merged",
+      "required_fields": {
+        "left": [
+          27,
+          38,
+          43
+        ],
+        "right": [
+          3,
+          9,
+          10,
+          82
+        ],
+        "merged": [
+          3,
+          9,
+          10,
+          27,
+          38,
+          43,
+          82
+        ]
+      }
+    },
+    {
+      "event": "complete",
+      "description": "When algorithm finishes",
+      "required_fields": {
+        "sorted_array": [
+          3,
+          9,
+          10,
+          27,
+          38,
+          43,
+          82
+        ]
+      }
+    }
+  ],
+  "graph": null,
+  "script": "Okay, let's trace Merge Sort on the array [38, 27, 43, 3, 9, 82, 10]. First, the array is initialized.  Then, it's split into two halves: [38, 27, 43] and [3, 9, 82, 10].  The left half is further split into [38] and [27, 43]. [27, 43] splits into [27] and [43].  Now, [27] and [43] are merged, resulting in [27, 43].  Next, [38] and [27, 43] are merged, producing [27, 38, 43].  Moving to the right half, [3, 9, 82, 10] is split into [3, 9] and [82, 10]. [3, 9] splits into [3] and [9], which are then merged into [3, 9]. [82, 10] splits into [82] and [10], and they merge into [10, 82].  Now [3, 9] and [10, 82] are merged, giving us [3, 9, 10, 82].  Finally, [27, 38, 43] and [3, 9, 10, 82] are merged, resulting in the sorted array [3, 9, 10, 27, 38, 43, 82]. The algorithm is now complete."
+}
