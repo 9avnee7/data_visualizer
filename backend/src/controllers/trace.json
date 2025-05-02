@@ -1,242 +1,254 @@
 {
-  "algorithmName": "merge",
+  "algorithmName": "bfs",
   "trace": [
     {
       "event": "init",
       "description": "Initialization of the algorithm",
       "required_fields": {
-        "array": [
-          38,
-          27,
-          43,
-          3,
-          9,
-          82,
-          10
+        "start": "A",
+        "queue": [
+          "A"
+        ],
+        "visited": []
+      }
+    },
+    {
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
+      "required_fields": {
+        "node": "A",
+        "queue": [],
+        "visited": [
+          "A"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
       "required_fields": {
-        "parent_array": [
-          38,
-          27,
-          43,
-          3,
-          9,
-          82,
-          10
-        ],
-        "left_half": [
-          38,
-          27,
-          43
-        ],
-        "right_half": [
-          3,
-          9,
-          82,
-          10
+        "current": "A",
+        "neighbor": "B",
+        "visited": [
+          "A"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "enqueue",
+      "description": "When a node is added to the queue",
       "required_fields": {
-        "parent_array": [
-          38,
-          27,
-          43
+        "node": "B",
+        "queue": [
+          "B"
         ],
-        "left_half": [
-          38
-        ],
-        "right_half": [
-          27,
-          43
+        "visited": [
+          "A"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
       "required_fields": {
-        "parent_array": [
-          27,
-          43
-        ],
-        "left_half": [
-          27
-        ],
-        "right_half": [
-          43
+        "current": "A",
+        "neighbor": "C",
+        "visited": [
+          "A"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "enqueue",
+      "description": "When a node is added to the queue",
       "required_fields": {
-        "left": [
-          27
+        "node": "C",
+        "queue": [
+          "B",
+          "C"
         ],
-        "right": [
-          43
-        ],
-        "merged": [
-          27,
-          43
+        "visited": [
+          "A"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
       "required_fields": {
-        "left": [
-          38
+        "node": "B",
+        "queue": [
+          "C"
         ],
-        "right": [
-          27,
-          43
-        ],
-        "merged": [
-          27,
-          38,
-          43
+        "visited": [
+          "A",
+          "B"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
       "required_fields": {
-        "parent_array": [
-          3,
-          9,
-          82,
-          10
-        ],
-        "left_half": [
-          3,
-          9
-        ],
-        "right_half": [
-          82,
-          10
+        "current": "B",
+        "neighbor": "D",
+        "visited": [
+          "A",
+          "B"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "enqueue",
+      "description": "When a node is added to the queue",
       "required_fields": {
-        "parent_array": [
-          3,
-          9
+        "node": "D",
+        "queue": [
+          "C",
+          "D"
         ],
-        "left_half": [
-          3
-        ],
-        "right_half": [
-          9
+        "visited": [
+          "A",
+          "B"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
       "required_fields": {
-        "left": [
-          3
-        ],
-        "right": [
-          9
-        ],
-        "merged": [
-          3,
-          9
+        "current": "B",
+        "neighbor": "E",
+        "visited": [
+          "A",
+          "B"
         ]
       }
     },
     {
-      "event": "split",
-      "description": "When the array is being split",
+      "event": "enqueue",
+      "description": "When a node is added to the queue",
       "required_fields": {
-        "parent_array": [
-          82,
-          10
+        "node": "E",
+        "queue": [
+          "C",
+          "D",
+          "E"
         ],
-        "left_half": [
-          82
-        ],
-        "right_half": [
-          10
+        "visited": [
+          "A",
+          "B"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
       "required_fields": {
-        "left": [
-          82
+        "node": "C",
+        "queue": [
+          "D",
+          "E"
         ],
-        "right": [
-          10
-        ],
-        "merged": [
-          10,
-          82
+        "visited": [
+          "A",
+          "B",
+          "C"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
       "required_fields": {
-        "left": [
-          3,
-          9
-        ],
-        "right": [
-          10,
-          82
-        ],
-        "merged": [
-          3,
-          9,
-          10,
-          82
+        "current": "C",
+        "neighbor": "F",
+        "visited": [
+          "A",
+          "B",
+          "C"
         ]
       }
     },
     {
-      "event": "merge",
-      "description": "When two halves are being merged",
+      "event": "enqueue",
+      "description": "When a node is added to the queue",
       "required_fields": {
-        "left": [
-          27,
-          38,
-          43
+        "node": "F",
+        "queue": [
+          "D",
+          "E",
+          "F"
         ],
-        "right": [
-          3,
-          9,
-          10,
-          82
+        "visited": [
+          "A",
+          "B",
+          "C"
+        ]
+      }
+    },
+    {
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
+      "required_fields": {
+        "node": "D",
+        "queue": [
+          "E",
+          "F"
         ],
-        "merged": [
-          3,
-          9,
-          10,
-          27,
-          38,
-          43,
-          82
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D"
+        ]
+      }
+    },
+    {
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
+      "required_fields": {
+        "node": "E",
+        "queue": [
+          "F"
+        ],
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ]
+      }
+    },
+    {
+      "event": "neighbor_check",
+      "description": "When checking a neighbor node",
+      "required_fields": {
+        "current": "E",
+        "neighbor": "F",
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E"
+        ]
+      }
+    },
+    {
+      "event": "dequeue",
+      "description": "When a node is processed from the queue",
+      "required_fields": {
+        "node": "F",
+        "queue": [],
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F"
         ]
       }
     },
@@ -244,18 +256,34 @@
       "event": "complete",
       "description": "When algorithm finishes",
       "required_fields": {
-        "sorted_array": [
-          3,
-          9,
-          10,
-          27,
-          38,
-          43,
-          82
+        "visited": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F"
         ]
       }
     }
   ],
-  "graph": null,
-  "script": "Okay, let's trace Merge Sort on the array [38, 27, 43, 3, 9, 82, 10]. First, the array is initialized.  Then, it's split into two halves: [38, 27, 43] and [3, 9, 82, 10].  The left half is further split into [38] and [27, 43]. [27, 43] splits into [27] and [43].  Now, [27] and [43] are merged, resulting in [27, 43].  Next, [38] and [27, 43] are merged, producing [27, 38, 43].  Moving to the right half, [3, 9, 82, 10] is split into [3, 9] and [82, 10]. [3, 9] splits into [3] and [9], which are then merged into [3, 9]. [82, 10] splits into [82] and [10], and they merge into [10, 82].  Now [3, 9] and [10, 82] are merged, giving us [3, 9, 10, 82].  Finally, [27, 38, 43] and [3, 9, 10, 82] are merged, resulting in the sorted array [3, 9, 10, 27, 38, 43, 82]. The algorithm is now complete."
+  "graph": {
+    "A": [
+      "B",
+      "C"
+    ],
+    "B": [
+      "D",
+      "E"
+    ],
+    "C": [
+      "F"
+    ],
+    "D": [],
+    "E": [
+      "F"
+    ],
+    "F": []
+  },
+  "script": "The BFS algorithm starts by initializing the queue with node A and marking it as visited. Node A is dequeued and printed. Then, neighbors B and C of A are enqueued and marked as visited. Next, B is dequeued. Its neighbors D and E are enqueued and marked as visited. Following this, C is dequeued, and its neighbor F is enqueued and marked as visited. Finally, D, E and F are dequeued one by one. The algorithm completes after processing all reachable nodes."
 }

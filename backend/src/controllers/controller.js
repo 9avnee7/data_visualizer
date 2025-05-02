@@ -13,81 +13,6 @@ const template=require('../utils/template')
 
 
 
-// Import v3 S3 client
-const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-
-// Initialize S3 client
-const s3 = new S3Client({
-  region: "ap-south-1",
-  credentials: {
-    accessKeyId: process.env.aws_access_key,  // Store in environment variables
-    secretAccessKey: process.env.aws_secret_access_key,
-  },
-});
-
-const uploadCodeToS3 = async (req, res) => {
-    logger.info("upload endpoint hit");
-    const { algorithmName, code } = req.body;
-
-    try {
-        // Input validation with detailed logging
-        if (!algorithmName || !code) {
-            logger.error('Missing required fields', { 
-                algorithmNamePresent: !!algorithmName,
-                codePresent: !!code
-            });
-            return res.status(400).json({ error: 'Both algorithmName and code are required.' });
-        }
-        console.log('Received:', { algorithmName: typeof algorithmName, code: typeof code });
-
-        if (typeof algorithmName !== 'string' || typeof code !== 'string') {
-            logger.error('Invalid field types', {
-                algorithmNameType: typeof algorithmName,
-                codeType: typeof code
-            });
-            return res.status(400).json({ error: 'algorithmName and code must be strings.' });
-        }
-
-        const sanitizedAlgorithmName = algorithmName.replace(/[^a-zA-Z0-9_-]/g, '');
-        logger.info('Sanitized algorithm name', {
-            original: algorithmName,
-            sanitized: sanitizedAlgorithmName
-        });
-
-        const params = {
-            Bucket: "store-user-traced-code",
-            Key: `userCode/${sanitizedAlgorithmName}.py`,
-            Body: code,
-        };
-
-        logger.info('Attempting S3 upload', {
-            bucket: params.Bucket,
-            key: params.Key,
-            bodyLength: code.length
-        });
-
-        await s3.send(new PutObjectCommand(params));
-        logger.info('S3 upload successful', { key: params.Key });
-
-        return res.status(200).json({ 
-            success: true,
-            fileName: `${sanitizedAlgorithmName}.py`
-        });
-
-    } catch (e) {
-        logger.error('S3 upload failed', {
-            error: e.message,
-            stack: e.stack,
-            bucket: "store-user-traced-code",
-            timestamp: new Date().toISOString()
-        });
-        
-        return res.status(500).json({ 
-            error: "Failed to upload code.",
-            details: process.env.NODE_ENV === 'development' ? e.message : undefined
-        });
-    }
-};
 const handleCodeValidation = (req, res) => {
   logger.info("Validation endpoint hit");
 
@@ -275,28 +200,28 @@ const handleGenerateTrace = async (req, res) => {
       return res.status(400).json({ error: `No template found for algorithm: ${sanitizedName}` });
     }
 
-    // console.log("Sanitized Algorithm:", sanitizedName);
-    // console.log("User Code:", code);
+    console.log("Sanitized Algorithm:", sanitizedName);
+    console.log("User Code:", code);
 
-    // // Call Gemini Service to generate trace
-    // let completeResponse;
-    // try {
-    //   completeResponse = await GeminiService.generateTrace(code, algoTemplate, algorithmName);
-    // } catch (geminiError) {
-    //   console.error("Gemini Service Error:", geminiError.message);
-    //   return res.status(500).json({ error: "Failed to generate trace using Gemini" });
-    // }
+    // Call Gemini Service to generate trace
+    let completeResponse;
+    try {
+      completeResponse = await GeminiService.generateTrace(code, algoTemplate, algorithmName);
+    } catch (geminiError) {
+      console.error("Gemini Service Error:", geminiError.message);
+      return res.status(500).json({ error: "Failed to generate trace using Gemini" });
+    }
 
-    // // Save trace to JSON file
-    // const filePath = path.join(__dirname, `trace.json`);
-    // try {
-    //   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-    //   fs.writeFileSync(filePath, JSON.stringify(completeResponse, null, 2), 'utf-8');
-    //   console.log("Trace file written successfully");
-    // } catch (fsError) {
-    //   console.error("File system error:", fsError.message);
-    //   return res.status(500).json({ error: "Failed to write trace file" });
-    // }
+    // Save trace to JSON file
+    const filePath = path.join(__dirname, `trace.json`);
+    try {
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+      fs.writeFileSync(filePath, JSON.stringify(completeResponse, null, 2), 'utf-8');
+      console.log("Trace file written successfully");
+    } catch (fsError) {
+      console.error("File system error:", fsError.message);
+      return res.status(500).json({ error: "Failed to write trace file" });
+    }
 
     console.log("Gemini trace completed");
     console.log("Starting bash file");
@@ -311,9 +236,11 @@ const handleGenerateTrace = async (req, res) => {
 
       console.log(`Script output: ${stdout}`);
       // Extract HLS_URL from stdout
-      const match = stdout.match(/hls URL: (.*)/);
-      console.log(match)
+      const match = stdout.match(/hls URL: (https:\/\/[^\s]+\.m3u8)/);
+      console.log(match);
       const hlsUrl = match ? match[1] : null;
+
+
 
      if (!hlsUrl) {
         return res.status(500).json({ message: 'HLS URL not found in script output.' });
@@ -332,5 +259,5 @@ const handleGenerateTrace = async (req, res) => {
 
 
 
-module.exports = { handleCodeValidation ,uploadCodeToS3,handleGenerateTrace};
+module.exports = { handleCodeValidation ,handleGenerateTrace};
   

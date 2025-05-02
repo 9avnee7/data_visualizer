@@ -38,15 +38,7 @@ def upload_video_to_cloudinary(video_path):
         print("secure URL:", secure_url)
         print("hls URL:", hls_url)
 
-        # Path to the JS file
-        js_file_path = "/Users/navneet/Documents/Internshiptasks/algorithmVisualizer/frontend/src/components/utils/utils.js"
-
-        # JavaScript code to export the URL
-        js_code = f'export const hlsURL = "{hls_url}";\n export const secureURL = "{secure_url}";\n'
-
-        # Write to the JS file
-        with open(js_file_path, "w") as f:
-            f.write(js_code)
+       
 
         # print(f"Video URL saved to {js_file_path}")
         return hls_url,secure_url

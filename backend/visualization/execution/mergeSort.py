@@ -13,241 +13,199 @@ with open('/Users/navneet/Documents/Internshiptasks/algorithmVisualizer/backend/
 
 graph_input=data["graph"]
 tracing_steps_input=data["trace"]
-
 class MergeSortVisualization(Scene):
     def construct(self):
         # Load tracing steps
         tracing_steps = tracing_steps_input
         
-        # Configuration
-        self.array_height = 0.7
-        self.array_width = 0.7
-        self.level_spacing = 1.5
-        self.horizontal_spacing = 1.2
-        self.animation_speed = 0.5
+        # Create initial array visualization
+        initial_array = tracing_steps[0]["required_fields"]["array"]
+        array_mobj = self.create_array_visualization(initial_array)
+        self.play(FadeIn(array_mobj))
+        self.wait(1)
         
-        # Track all created mobjects with parent-child relationships
-        self.array_mobjects = {}  # Key: str(array), Value: (mobject, parent_key)
-        self.arrows = []
-        self.level_positions = {}
-        
-        # Create initial visualization
-        self.initial_array = tracing_steps[0]["required_fields"]["array"]
-        self.initialize_visualization()
+        # Create a stack to keep track of recursive calls
+        call_stack = []
+        current_level = 0
         
         # Animate each step
-        self.process_steps(tracing_steps[1:])
+        for step in tracing_steps[1:]:
+            event = step["event"]
+            fields = step["required_fields"]
+            
+            if event == "split":
+                # Create visualization for the split
+                parent_array = fields["parent_array"]
+                left_half = fields["left_half"]
+                right_half = fields["right_half"]
+                
+                # Find the parent array mobject
+                parent_mobj = self.find_array_mobject(array_mobj, parent_array)
+                
+                # Create split animation
+                self.play(
+                    parent_mobj.animate.set_color(GRAY),
+                    run_time=0.5
+                )
+                
+                # Create left and right halves
+                left_mobj = self.create_array_visualization(left_half, color=BLUE_E)
+                right_mobj = self.create_array_visualization(right_half, color=RED_E)
+                
+                # Position them below the parent
+                group = VGroup(left_mobj, right_mobj)
+                group.arrange(RIGHT, buff=1.5)
+                group.next_to(parent_mobj, DOWN, buff=1.0)
+                
+                # Draw arrows from parent to children
+                left_arrow = Arrow(
+                    parent_mobj.get_bottom(), 
+                    left_mobj.get_top(), 
+                    color=BLUE_C,
+                    buff=0.2
+                )
+                right_arrow = Arrow(
+                    parent_mobj.get_bottom(), 
+                    right_mobj.get_top(), 
+                    color=RED_C,
+                    buff=0.2
+                )
+                
+                # Animate the split
+                self.play(
+                    FadeIn(left_mobj),
+                    FadeIn(right_mobj),
+                    GrowArrow(left_arrow),
+                    GrowArrow(right_arrow),
+                    run_time=1
+                )
+                
+                # Add to call stack
+                call_stack.append((parent_mobj, left_mobj, right_mobj, left_arrow, right_arrow))
+                current_level += 1
+                
+            elif event == "merge":
+                # Get the left and right halves to merge
+                left = fields["left"]
+                right = fields["right"]
+                merged = fields["merged"]
+                
+                # Find the left and right mobjects
+                left_mobj = self.find_array_mobject(array_mobj, left)
+                right_mobj = self.find_array_mobject(array_mobj, right)
+                
+                # Highlight the halves being merged
+                self.play(
+                    left_mobj.animate.set_color(BLUE),
+                    right_mobj.animate.set_color(RED),
+                    run_time=0.5
+                )
+                
+                # Create merged array
+                merged_mobj = self.create_array_visualization(merged, color=GREEN_E)
+                
+                # Position it above the halves being merged
+                parent_info = call_stack.pop()
+                parent_pos = parent_info[0].get_center()
+                merged_mobj.move_to(parent_pos)
+                
+                # Create merge animation
+                self.play(
+                    ReplacementTransform(left_mobj.copy(), merged_mobj),
+                    ReplacementTransform(right_mobj.copy(), merged_mobj),
+                    run_time=1.5
+                )
+                
+                # Remove the old halves and arrows
+                self.play(
+                    FadeOut(left_mobj),
+                    FadeOut(right_mobj),
+                    FadeOut(parent_info[3]),  # left arrow
+                    FadeOut(parent_info[4]),  # right arrow
+                    run_time=0.5
+                )
+                
+                # Replace parent with merged array
+                self.play(
+                    Transform(parent_info[0], merged_mobj),
+                    run_time=0.7
+                )
+                
+                # Reset color
+                self.play(
+                    parent_info[0].animate.set_color(WHITE),
+                    run_time=0.3
+                )
+                
+                current_level -= 1
+                
+            elif event == "complete":
+                # Final sorted array
+                sorted_array = fields["sorted_array"]
+                final_mobj = self.find_array_mobject(array_mobj, sorted_array)
+                
+                # Celebration animation
+                self.play(
+                    final_mobj.animate.set_color(GOLD).scale(1.1),
+                    run_time=0.5
+                )
+                self.play(
+                    final_mobj.animate.set_color(GREEN).scale(1/1.1),
+                    run_time=0.5
+                )
+                
+                # Add completion text
+                completion_text = Text("Merge Sort Complete!", font_size=36, color=GOLD_E)
+                completion_text.next_to(final_mobj, DOWN, buff=1.0)
+                
+                self.play(
+                    Write(completion_text),
+                    run_time=1
+                )
+                self.wait(2)
     
-    def initialize_visualization(self):
-        """Create initial array visualization"""
-        initial_mobj = self.create_array_mobject(
-            self.initial_array, 
-            level=0,
-            position=ORIGIN
-        )
-        self.array_mobjects[str(self.initial_array)] = (initial_mobj, None)
-        self.play(FadeIn(initial_mobj))
-        self.wait(self.animation_speed)
-        
-        # Set up level positions
-        max_depth = 3  # Based on your sample data
-        for level in range(max_depth + 1):
-            self.level_positions[level] = UP * (3 - level) * self.level_spacing
-    
-    def process_steps(self, steps):
-        """Process each step in the trace"""
-        for step in steps:
-            self.handle_step(step)
-    
-    def handle_step(self, step):
-        """Handle different types of steps"""
-        event = step["event"]
-        fields = step["required_fields"]
-        
-        if event == "split":
-            self.animate_split(
-                fields["parent_array"],
-                fields["left_half"],
-                fields["right_half"]
-            )
-        elif event == "merge":
-            self.animate_merge(
-                fields["left"],
-                fields["right"],
-                fields["merged"]
-            )
-        elif event == "complete":
-            self.animate_completion(fields["sorted_array"])
-    
-    def animate_split(self, parent_array, left_half, right_half):
-        """Animate splitting an array into two halves"""
-        parent_mobj, _ = self.array_mobjects[str(parent_array)]
-        level = self.get_level(parent_mobj)
-        new_level = level + 1
-        
-        # Calculate positions
-        left_pos = parent_mobj.get_center() + LEFT * self.horizontal_spacing + DOWN * self.level_spacing
-        right_pos = parent_mobj.get_center() + RIGHT * self.horizontal_spacing + DOWN * self.level_spacing
-        
-        # Create left and right halves
-        left_mobj = self.create_array_mobject(left_half, new_level, left_pos)
-        right_mobj = self.create_array_mobject(right_half, new_level, right_pos)
-        
-        # Create connecting arrows
-        left_arrow = Arrow(
-            parent_mobj.get_bottom(),
-            left_mobj.get_top(),
-            color=BLUE_C,
-            buff=0.1,
-            stroke_width=3
-        )
-        right_arrow = Arrow(
-            parent_mobj.get_bottom(),
-            right_mobj.get_top(),
-            color=RED_C,
-            buff=0.1,
-            stroke_width=3
-        )
-        
-        # Animate
-        self.play(
-            parent_mobj.animate.set_color(GRAY),
-            run_time=self.animation_speed
-        )
-        self.play(
-            AnimationGroup(
-                FadeIn(left_mobj, shift=UP*0.3),
-                FadeIn(right_mobj, shift=UP*0.3),
-                GrowArrow(left_arrow),
-                GrowArrow(right_arrow),
-                lag_ratio=0.3
-            ),
-            run_time=self.animation_speed * 1.5
-        )
-        
-        # Store references with parent information
-        self.array_mobjects[str(left_half)] = (left_mobj, str(parent_array))
-        self.array_mobjects[str(right_half)] = (right_mobj, str(parent_array))
-        self.arrows.extend([left_arrow, right_arrow])
-        
-        # Add split indicator
-        split_text = Text("Split", font_size=20, color=YELLOW)
-        split_text.next_to(parent_mobj, UP, buff=0.2)
-        self.play(Write(split_text), run_time=self.animation_speed/2)
-        self.play(FadeOut(split_text), run_time=self.animation_speed/2)
-    
-    def animate_merge(self, left, right, merged):
-        """Animate merging two sorted halves"""
-        left_mobj, left_parent_key = self.array_mobjects[str(left)]
-        right_mobj, right_parent_key = self.array_mobjects[str(right)]
-        
-        # Both halves should have the same parent
-        parent_key = left_parent_key
-        parent_mobj, _ = self.array_mobjects[parent_key]
-        
-        # Highlight halves being merged
-        self.play(
-            left_mobj.animate.set_color(BLUE),
-            right_mobj.animate.set_color(RED),
-            run_time=self.animation_speed
-        )
-        
-        # Create merged array at parent position
-        merged_mobj = self.create_array_mobject(
-            merged,
-            level=self.get_level(parent_mobj),
-            position=parent_mobj.get_center(),
-            color=GREEN
-        )
-        
-        # Animate elements merging
-        merge_animations = []
-        for i in range(len(left)):
-            merge_animations.append(Transform(left_mobj[i].copy(), merged_mobj[i]))
-        for j in range(len(right)):
-            merge_animations.append(Transform(right_mobj[j].copy(), merged_mobj[len(left)+j]))
-        
-        self.play(
-            AnimationGroup(*merge_animations, lag_ratio=0.1),
-            run_time=self.animation_speed * 2
-        )
-        
-        # Replace parent with merged array
-        self.play(
-            Transform(parent_mobj, merged_mobj),
-            run_time=self.animation_speed
-        )
-        
-        # Clean up
-        self.play(
-            FadeOut(left_mobj),
-            FadeOut(right_mobj),
-            *[FadeOut(arrow) for arrow in self.get_connected_arrows(left_mobj, right_mobj)],
-            run_time=self.animation_speed
-        )
-        
-        # Update references
-        self.array_mobjects[str(merged)] = (parent_mobj, self.array_mobjects[parent_key][1])
-        parent_mobj.set_color(WHITE)
-    
-    def animate_completion(self, sorted_array):
-        """Animate final sorted array"""
-        final_mobj, _ = self.array_mobjects[str(sorted_array)]
-        
-        # Celebration animation
-        self.play(
-            final_mobj.animate.set_color(GOLD).scale(1.1),
-            run_time=self.animation_speed
-        )
-        
-        completion_text = Text("Merge Sort Complete!", font_size=36, color=GOLD)
-        completion_text.next_to(final_mobj, DOWN, buff=1)
-        
-        self.play(
-            final_mobj.animate.scale(1/1.1).set_color(GREEN),
-            Write(completion_text),
-            run_time=self.animation_speed * 1.5
-        )
-        self.wait(2)
-    
-    def create_array_mobject(self, array, level=0, position=None, color=WHITE):
-        """Create a visual representation of an array"""
-        if position is None:
-            position = self.level_positions[level]
-        
+    def create_array_visualization(self, array: List, color=WHITE) -> VGroup:
+        """Create visual representation of an array"""
         elements = VGroup()
-        for num in array:
-            # Create element with background
+        
+        for i, num in enumerate(array):
+            # Create rectangle for array element
             rect = Rectangle(
-                height=self.array_height,
-                width=self.array_width,
+                width=0.8, 
+                height=0.8, 
                 color=color,
                 fill_opacity=0.3
             )
+            
+            # Add number text
             num_text = Text(str(num), font_size=24).move_to(rect.get_center())
+            
+            # Group rectangle and text
             element = VGroup(rect, num_text)
             elements.add(element)
         
-        # Arrange elements
+        # Arrange elements horizontally
         elements.arrange(RIGHT, buff=0.1)
-        elements.move_to(position)
-        
-        # Add array identifier
-        elements.array_data = array.copy()
-        elements.level = level
-        
         return elements
     
-    def get_level(self, mobject):
-        """Get the recursion level of an array mobject"""
-        return getattr(mobject, "level", 0)
-    
-    def get_connected_arrows(self, *mobjects):
-        """Get arrows connected to these mobjects"""
-        connected = []
-        for arrow in self.arrows:
-            for mobj in mobjects:
-                if (arrow.get_start() == mobj.get_top() or 
-                    arrow.get_end() == mobj.get_top()):
-                    connected.append(arrow)
-        return connected
+    def find_array_mobject(self, root_mobj: VGroup, array: List) -> VGroup:
+        """Find the mobject representing a specific array in the visualization"""
+        # This is a simplified version - in a full implementation you'd need to track
+        # which mobject represents which array throughout the animation
+        # For this example, we'll just return the first matching mobject we find
+        
+        # Check if this is the root array
+        if len(root_mobj) == len(array):
+            match = True
+            for i in range(len(array)):
+                if root_mobj[i][1].text != str(array[i]):
+                    match = False
+                    break
+            if match:
+                return root_mobj
+        
+        # Recursively check children (not fully implemented in this example)
+        # In a complete implementation, you would track parent-child relationships
+        
+        # For this demo, we'll create a new one if not found
+        return self.create_array_visualization(array)

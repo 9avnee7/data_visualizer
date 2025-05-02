@@ -2,20 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
-import VideoPlayer from './videoPlayer/videoPlayer';
 
 const Editor = () => {
   const [algorithm, setAlgorithm] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
+  const [videoURL, setVideoURL] = useState(null); // default should be null
   const videoRef = useRef(null);
-  const playerRef = useRef(null); 
+  const playerRef = useRef(null);
 
   const algorithms = ['Dijkstra', 'Merge Sort', 'Quick Sort', 'BFS', 'DFS'];
 
   useEffect(() => {
-    if (videoReady && videoRef.current && !playerRef.current) {
+    if (videoURL && videoRef.current && !playerRef.current) {
       playerRef.current = videojs(videoRef.current, {
         autoplay: true,
         controls: true,
@@ -30,24 +29,21 @@ const Editor = () => {
         playerRef.current = null;
       }
     };
-  }, [videoReady]); // re-run when video becomes ready
+  }, [videoURL]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setVideoReady(false); // Reset video
+    setVideoURL(null); // reset previous video
 
     try {
-      // Step 1: Validate
       const res = await axios.post('http://localhost:3000/api/validate', {
         algorithmType: algorithm,
         code,
       });
-      console.log(res)
       alert(res.data.message);
 
-      // Step 2: Generate trace (but don't expect HLS from response)
-      await axios.post(
+      const response = await axios.post(
         'http://localhost:3000/api/trace',
         {
           algorithmName: String(algorithm),
@@ -58,9 +54,9 @@ const Editor = () => {
         }
       );
 
-      // Step 3: Assume the trace and video are generated and available at known HLS URL
-      setVideoReady(true);
-      
+      if (response.data.hlsUrl) {
+        setVideoURL(response.data.hlsUrl); // set new video URL
+      }
 
     } catch (err) {
       alert(err.response?.data?.message || 'An error occurred.');
@@ -112,8 +108,20 @@ const Editor = () => {
         </button>
       </form>
 
-      {videoReady && (
-        <VideoPlayer videoRef={videoRef}/>
+      {videoURL && (
+        <div className="mt-6 space-y-4">
+          <h3 className="text-xl font-semibold">Generated Visualization</h3>
+          <video
+            ref={videoRef}
+            className="video-js vjs-default-skin"
+            controls
+            preload="auto"
+            width="640"
+            height="360"
+          >
+            <source src={videoURL} type="application/x-mpegURL" />
+          </video>
+        </div>
       )}
     </div>
   );
