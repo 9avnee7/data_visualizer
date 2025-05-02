@@ -1,289 +1,342 @@
 {
-  "algorithmName": "bfs",
+  "algorithmName": "dijkstra",
   "trace": [
     {
       "event": "init",
       "description": "Initialization of the algorithm",
       "required_fields": {
         "start": "A",
+        "distances": {
+          "A": 0,
+          "B": "Infinity",
+          "C": "Infinity",
+          "D": "Infinity"
+        },
         "queue": [
-          "A"
+          [
+            0,
+            "A"
+          ]
         ],
         "visited": []
       }
     },
     {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
+      "event": "visit",
+      "description": "When a node is being processed",
       "required_fields": {
         "node": "A",
-        "queue": [],
-        "visited": [
-          "A"
-        ]
-      }
-    },
-    {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
-      "required_fields": {
-        "current": "A",
-        "neighbor": "B",
-        "visited": [
-          "A"
-        ]
-      }
-    },
-    {
-      "event": "enqueue",
-      "description": "When a node is added to the queue",
-      "required_fields": {
-        "node": "B",
+        "distance": 0,
+        "distances": {
+          "A": 0,
+          "B": "Infinity",
+          "C": "Infinity",
+          "D": "Infinity"
+        },
         "queue": [
-          "B"
+          [
+            0,
+            "A"
+          ]
         ],
-        "visited": [
-          "A"
-        ]
+        "visited": []
       }
     },
     {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
+      "event": "check_relax",
+      "description": "Before checking if edge relaxation is needed",
       "required_fields": {
-        "current": "A",
-        "neighbor": "C",
-        "visited": [
-          "A"
+        "from": "A",
+        "to": "B",
+        "current_distance": 0,
+        "edge_weight": 4,
+        "old_distance": "Infinity",
+        "new_distance": 4,
+        "will_update": true
+      }
+    },
+    {
+      "event": "relax",
+      "description": "After updating a node's distance",
+      "required_fields": {
+        "from": "A",
+        "to": "B",
+        "new_distance": 4,
+        "distances": {
+          "A": 0,
+          "B": 4,
+          "C": "Infinity",
+          "D": "Infinity"
+        },
+        "queue": [
+          [
+            4,
+            "B"
+          ]
         ]
       }
     },
     {
-      "event": "enqueue",
-      "description": "When a node is added to the queue",
+      "event": "check_relax",
+      "description": "Before checking if edge relaxation is needed",
+      "required_fields": {
+        "from": "A",
+        "to": "C",
+        "current_distance": 0,
+        "edge_weight": 1,
+        "old_distance": "Infinity",
+        "new_distance": 1,
+        "will_update": true
+      }
+    },
+    {
+      "event": "relax",
+      "description": "After updating a node's distance",
+      "required_fields": {
+        "from": "A",
+        "to": "C",
+        "new_distance": 1,
+        "distances": {
+          "A": 0,
+          "B": 4,
+          "C": 1,
+          "D": "Infinity"
+        },
+        "queue": [
+          [
+            4,
+            "B"
+          ],
+          [
+            1,
+            "C"
+          ]
+        ]
+      }
+    },
+    {
+      "event": "visit",
+      "description": "When a node is being processed",
       "required_fields": {
         "node": "C",
+        "distance": 1,
+        "distances": {
+          "A": 0,
+          "B": 4,
+          "C": 1,
+          "D": "Infinity"
+        },
         "queue": [
-          "B",
-          "C"
+          [
+            4,
+            "B"
+          ],
+          [
+            1,
+            "C"
+          ]
         ],
-        "visited": [
-          "A"
+        "visited": []
+      }
+    },
+    {
+      "event": "check_relax",
+      "description": "Before checking if edge relaxation is needed",
+      "required_fields": {
+        "from": "C",
+        "to": "B",
+        "current_distance": 1,
+        "edge_weight": 2,
+        "old_distance": 4,
+        "new_distance": 3,
+        "will_update": true
+      }
+    },
+    {
+      "event": "relax",
+      "description": "After updating a node's distance",
+      "required_fields": {
+        "from": "C",
+        "to": "B",
+        "new_distance": 3,
+        "distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": "Infinity"
+        },
+        "queue": [
+          [
+            3,
+            "B"
+          ],
+          [
+            5,
+            "D"
+          ]
         ]
       }
     },
     {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
+      "event": "check_relax",
+      "description": "Before checking if edge relaxation is needed",
+      "required_fields": {
+        "from": "C",
+        "to": "D",
+        "current_distance": 1,
+        "edge_weight": 5,
+        "old_distance": "Infinity",
+        "new_distance": 6,
+        "will_update": true
+      }
+    },
+    {
+      "event": "relax",
+      "description": "After updating a node's distance",
+      "required_fields": {
+        "from": "C",
+        "to": "D",
+        "new_distance": 6,
+        "distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": 6
+        },
+        "queue": [
+          [
+            3,
+            "B"
+          ],
+          [
+            6,
+            "D"
+          ]
+        ]
+      }
+    },
+    {
+      "event": "visit",
+      "description": "When a node is being processed",
       "required_fields": {
         "node": "B",
+        "distance": 3,
+        "distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": 6
+        },
         "queue": [
-          "C"
+          [
+            3,
+            "B"
+          ],
+          [
+            6,
+            "D"
+          ]
         ],
-        "visited": [
-          "A",
-          "B"
-        ]
+        "visited": []
       }
     },
     {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
+      "event": "check_relax",
+      "description": "Before checking if edge relaxation is needed",
       "required_fields": {
-        "current": "B",
-        "neighbor": "D",
-        "visited": [
-          "A",
-          "B"
+        "from": "B",
+        "to": "D",
+        "current_distance": 3,
+        "edge_weight": 1,
+        "old_distance": 6,
+        "new_distance": 4,
+        "will_update": true
+      }
+    },
+    {
+      "event": "relax",
+      "description": "After updating a node's distance",
+      "required_fields": {
+        "from": "B",
+        "to": "D",
+        "new_distance": 4,
+        "distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": 4
+        },
+        "queue": [
+          [
+            4,
+            "D"
+          ]
         ]
       }
     },
     {
-      "event": "enqueue",
-      "description": "When a node is added to the queue",
+      "event": "visit",
+      "description": "When a node is being processed",
       "required_fields": {
         "node": "D",
+        "distance": 4,
+        "distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": 4
+        },
         "queue": [
-          "C",
-          "D"
+          [
+            4,
+            "D"
+          ]
         ],
-        "visited": [
-          "A",
-          "B"
-        ]
-      }
-    },
-    {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
-      "required_fields": {
-        "current": "B",
-        "neighbor": "E",
-        "visited": [
-          "A",
-          "B"
-        ]
-      }
-    },
-    {
-      "event": "enqueue",
-      "description": "When a node is added to the queue",
-      "required_fields": {
-        "node": "E",
-        "queue": [
-          "C",
-          "D",
-          "E"
-        ],
-        "visited": [
-          "A",
-          "B"
-        ]
-      }
-    },
-    {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
-      "required_fields": {
-        "node": "C",
-        "queue": [
-          "D",
-          "E"
-        ],
-        "visited": [
-          "A",
-          "B",
-          "C"
-        ]
-      }
-    },
-    {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
-      "required_fields": {
-        "current": "C",
-        "neighbor": "F",
-        "visited": [
-          "A",
-          "B",
-          "C"
-        ]
-      }
-    },
-    {
-      "event": "enqueue",
-      "description": "When a node is added to the queue",
-      "required_fields": {
-        "node": "F",
-        "queue": [
-          "D",
-          "E",
-          "F"
-        ],
-        "visited": [
-          "A",
-          "B",
-          "C"
-        ]
-      }
-    },
-    {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
-      "required_fields": {
-        "node": "D",
-        "queue": [
-          "E",
-          "F"
-        ],
-        "visited": [
-          "A",
-          "B",
-          "C",
-          "D"
-        ]
-      }
-    },
-    {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
-      "required_fields": {
-        "node": "E",
-        "queue": [
-          "F"
-        ],
-        "visited": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ]
-      }
-    },
-    {
-      "event": "neighbor_check",
-      "description": "When checking a neighbor node",
-      "required_fields": {
-        "current": "E",
-        "neighbor": "F",
-        "visited": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E"
-        ]
-      }
-    },
-    {
-      "event": "dequeue",
-      "description": "When a node is processed from the queue",
-      "required_fields": {
-        "node": "F",
-        "queue": [],
-        "visited": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E",
-          "F"
-        ]
+        "visited": []
       }
     },
     {
       "event": "complete",
       "description": "When algorithm finishes",
       "required_fields": {
-        "visited": [
-          "A",
-          "B",
-          "C",
-          "D",
-          "E",
-          "F"
-        ]
+        "final_distances": {
+          "A": 0,
+          "B": 3,
+          "C": 1,
+          "D": 4
+        },
+        "paths": {}
       }
     }
   ],
   "graph": {
     "A": [
-      "B",
-      "C"
+      [
+        "B",
+        4
+      ],
+      [
+        "C",
+        1
+      ]
     ],
     "B": [
-      "D",
-      "E"
+      [
+        "D",
+        1
+      ]
     ],
     "C": [
-      "F"
+      [
+        "B",
+        2
+      ],
+      [
+        "D",
+        5
+      ]
     ],
-    "D": [],
-    "E": [
-      "F"
-    ],
-    "F": []
+    "D": []
   },
-  "script": "The BFS algorithm starts by initializing the queue with node A and marking it as visited. Node A is dequeued and printed. Then, neighbors B and C of A are enqueued and marked as visited. Next, B is dequeued. Its neighbors D and E are enqueued and marked as visited. Following this, C is dequeued, and its neighbor F is enqueued and marked as visited. Finally, D, E and F are dequeued one by one. The algorithm completes after processing all reachable nodes."
+  "script": "Dijkstra's algorithm begins with initialization. The distance to node 'A' is set to zero, while others are infinite. The priority queue starts with 'A'. Next, we visit 'A' and relax its neighbors.  The distance to 'B' updates to 4, and 'C' to 1, adding them to the queue. Now, 'C' is visited, relaxing 'B' to 3 and 'D' to 6. Then 'B' is visited which relaxing 'D' to 4. Finally, 'D' is visited. With no more nodes in the queue, the algorithm completes, providing the shortest distances from 'A' to each node."
 }

@@ -50,6 +50,7 @@ for bfs and dfs use this graph
     keep the script up to the limit like it should not cross 50 seconds
 
 Only return the variable declaration—no explanations, comments, or additional text.
+and keep in mind return only the valid json format nothing else only the valid json format consisting required properties
 `;
 
     try {

@@ -11,7 +11,7 @@ const Editor = () => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
 
-  const algorithms = ['Dijkstra', 'Merge Sort', 'Quick Sort', 'BFS', 'DFS'];
+  const algorithms = ['Dijkstra', 'Merge Sort', 'BFS', 'DFS'];
 
   useEffect(() => {
     if (videoURL && videoRef.current && !playerRef.current) {
